@@ -5,11 +5,11 @@ import numpy as np
 """ Ordinary least squares """
 
 
-w1 = 0.7 #крутизна наклона
-start_w1 = w1 #начальное значение
+w1 = 0.7 #slope steepness
+start_w1 = w1 #init value
 
-w2=random.uniform(-4,4) # движение прямой  по y
-start_w2 = w2
+w2 = random.uniform(-4,4) #movement along the y-axis
+start_w2 = w2 #init value
 
 print(f"Initial line: y = {w1} * x + {w2}")
 

@@ -2,11 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def generate_data(clusters_number):
+def generate_data(clusters_num):
     data = np.array([])
     labels = np.array([])
 
-    for i in range(clusters_number):
+    for i in range(clusters_num):
         mean = np.random.randint(-10, 10, 2)
         cov =  np.random.randint(-10, 10, [2, 2])
         objects_num = np.random.randint(10, 30, 1)
@@ -19,15 +19,15 @@ def generate_data(clusters_number):
 
     return data, labels
 
-data, labels = generate_data(clusters_number = 3)
+data, labels = generate_data(clusters_num = 3)
 
 
+"""K-nearest neighbors"""
 
 class KNN_Classifier():
 
-    def __init__(self, k  = 5) -> None:
+    def __init__(self, k = 5) -> None:
         self.k = k
-
         self.data = None
         self.labels = None
 
@@ -62,8 +62,8 @@ knn = KNN_Classifier(k = 5)
 knn.fit(data, labels)
 
 
-x_min, x_max = data[:,0].min()-1, data[:,0].max()+1
-y_min, y_max = data[:,1].min()-1, data[:,1].max()+1
+x_min, x_max = data[:,0].min()-1, data[:,0].max() + 1
+y_min, y_max = data[:,1].min()-1, data[:,1].max() + 1
 
 x_grid, y_grid = np.meshgrid(np.arange(x_min,x_max,.1),np.arange(y_min,y_max,.1))
 
