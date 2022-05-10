@@ -9,12 +9,12 @@ def generate_data(clusters_num):
     for i in range(clusters_num):
         mean = np.random.randint(-10, 10, 2)
         cov =  np.random.randint(-10, 10, [2, 2])
-        objects_num = np.random.randint(10, 30, 1)
+        samples_num = np.random.randint(10, 30, 1)
 
-        generated_cluster = np.random.multivariate_normal(mean, cov, objects_num)
+        generated_cluster = np.random.multivariate_normal(mean, cov, samples_num)
         data = np.concatenate([data, generated_cluster]) if data.size else generated_cluster
 
-        generated_claster_labels =np.full(objects_num, i, dtype=int)
+        generated_claster_labels =np.full(samples_num, i, dtype=int)
         labels = np.concatenate([labels, generated_claster_labels]) if labels.size else generated_claster_labels
 
     return data, labels
@@ -37,8 +37,8 @@ class KNN_Classifier():
         return np.linalg.norm(vector1 - vector2)
 
 
-    def find_nearest_neighbour(self, this_example):
-        distances = np.asfarray([self.euclidean_distance(this_example, example) for example in self.data])
+    def find_nearest_neighbour(self, this_sample):
+        distances = np.asfarray([self.euclidean_distance(this_sample, sample) for sample in self.data])
 
         indexes = distances.argsort()
 
@@ -54,7 +54,7 @@ class KNN_Classifier():
 
     def predict(self, new_data):
 
-        return np.asfarray([self.find_nearest_neighbour(example) for example in new_data])
+        return np.asfarray([self.find_nearest_neighbour(sample) for sample in new_data])
 
        
 

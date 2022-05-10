@@ -9,12 +9,12 @@ def generate_data(clusters_num):
     for i in range(clusters_num):
         mean = np.random.randint(-10, 10, 2)
         cov =  np.random.randint(-10, 10, [2, 2])
-        objects_num = np.random.randint(30, 100, 1)
+        samples_num = np.random.randint(30, 100, 1)
 
-        generated_cluster = np.random.multivariate_normal(mean, cov, objects_num)
+        generated_cluster = np.random.multivariate_normal(mean, cov, samples_num)
         data = np.concatenate([data, generated_cluster]) if data.size else generated_cluster
 
-        generated_claster_labels =np.full(objects_num, i, dtype=int)
+        generated_claster_labels =np.full(samples_num, i, dtype=int)
         labels = np.concatenate([labels, generated_claster_labels]) if labels.size else generated_claster_labels
 
     return data, labels
@@ -44,8 +44,8 @@ class K_Means():
         for _ in range(self.k - 1):
             min_distances = []
 
-            for example in self.data:
-                min_distance = np.asfarray([self.euclidean_distance(example, centroid) for centroid in self.centroids]).min()
+            for sample in self.data:
+                min_distance = np.asfarray([self.euclidean_distance(sample, centroid) for centroid in self.centroids]).min()
 
                 min_distances.append(min_distance)
 
@@ -63,17 +63,17 @@ class K_Means():
 
             clusters_per_centroids = [[] for _ in range(self.k)]
           
-            for example in self.data:
-                distances = np.asfarray([self.euclidean_distance(example, centroid) for centroid in self.centroids])
+            for sample in self.data:
+                distances = np.asfarray([self.euclidean_distance(sample, centroid) for centroid in self.centroids])
 
-                clusters_per_centroids[np.argmin(distances)].append(example)
+                clusters_per_centroids[np.argmin(distances)].append(sample)
 
             self.centroids = [np.mean(cluster, axis=0) for cluster in clusters_per_centroids]
             
         return np.asfarray(self.centroids)
 
-    def predict(self, example):
-        distances = np.asfarray([self.euclidean_distance(example, centroid) for centroid in self.centroids])
+    def predict(self, sample):
+        distances = np.asfarray([self.euclidean_distance(sample, centroid) for centroid in self.centroids])
 
         return np.argmin(distances)
 
