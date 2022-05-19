@@ -36,7 +36,7 @@ x_data, y_data = generate_data()
 
 bias = 1
 
-
+""" OLS as NN""" 
 # x * w0\
 #        > = y # simple perceptron (y = x * w0 + b * w1)
 # b * w1/
