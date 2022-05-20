@@ -34,6 +34,7 @@ def split_data(data, labels, ratio):
     return train_data, test_data, train_labels, test_labels
 
 
+#https://en.wikipedia.org/wiki/Random_forest
 
 class RandomForestClassifier():
 
