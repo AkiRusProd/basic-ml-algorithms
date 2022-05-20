@@ -53,6 +53,7 @@ for i in range (epochs):
 
 print(f"Line with gradient: y = {w1} * x + {w2}")
 
+""" OLS with formula""" 
 w1_f = (num * np.sum(x_data * y_data) - np.sum(x_data) * np.sum(y_data)) / (num * np.sum(x_data * x_data) - np.sum(x_data) * np.sum(x_data))
 w2_f = (np.sum(y_data)  - w1_f * np.sum(x_data)) / num
 

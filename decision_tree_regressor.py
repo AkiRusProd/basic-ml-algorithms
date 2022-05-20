@@ -1,85 +1,65 @@
 import numpy as np 
+import matplotlib.pyplot as plt
+ 
+
+def generate_dataset(n = 30, beta = 10, variance_reduction = 10):
+
+    e = (np.random.randn(n) * variance_reduction).round(decimals = 1)
+
+    x = (np.random.rand(n) * n)
+    y = (np.random.rand(n) * n)
+
+    z = x * beta + y * beta + e
+    x, y, z = np.expand_dims(x, axis = 1), np.expand_dims(y, axis = 1), np.expand_dims(z, axis = 1)
+
+    return np.concatenate((x, y, z), axis=1)
+ 
+data = generate_dataset(200)
 
 
 
-def generate_data(clusters_num):
-    data = np.array([], ndmin = 2)
-    labels = np.array([], ndmin = 2)
-
-    for i in range(clusters_num):
-        mean = np.random.randint(-10, 10, 2)
-        cov =  np.random.randint(-10, 10, [2, 2])
-        samples_num = np.random.randint(40, 100, 1)
-
-        generated_cluster = np.random.multivariate_normal(mean, cov, samples_num)
-        data = np.concatenate([data, generated_cluster]) if data.size else generated_cluster
-
-        generated_claster_labels =np.full(samples_num, i, dtype=int)
-        labels = np.concatenate([labels, generated_claster_labels]) if labels.size else generated_claster_labels
-
-    return data, labels
-
-generated_data, generated_labels = generate_data(clusters_num = 2) #cluster equal class
-
-
-def split_data(data, labels, ratio):
+def split_data(data, ratio):
     indices = np.arange(len(data))
     np.random.shuffle(indices)
 
-    data, labels = data[indices].reshape(data.shape), labels[indices].reshape(labels.shape)
+    data = data[indices].reshape(data.shape)
 
     train_data, test_data = data[:int(len(data) * (1 - ratio))], data[-int(len(data) * ratio):]
-    train_labels, test_labels = labels[:int(len(data) * (1 - ratio))], labels[-int(len(data) * ratio):]
-
-    return train_data, test_data, train_labels, test_labels
-
+   
+    return train_data[:, :2], test_data[:, :2], train_data[:, 2], test_data[:, 2]
 
 
-train_data, test_data, train_labels, test_labels =  split_data(generated_data, generated_labels, ratio = 0.25)
+x_train, x_test, y_train, y_test = split_data(data, ratio = 0.25)
+
 
 
 """CART Decision Tree"""
 #https://en.wikipedia.org/wiki/Decision_tree_learning
 
 class Node():
-    def __init__(self, feature_index=None, threshold_value = None, left = None, right = None, information_gain = None, class_value = None):
+    def __init__(self, feature_index=None, threshold_value = None, left = None, right = None, variance_reduction = None, class_value = None):
 
         self.feature_index = feature_index
         self.threshold_value = threshold_value
         self.left = left
         self.right = right
-        self.information_gain = information_gain
+        self.variance_reduction = variance_reduction
         self.class_value = class_value
 
 
-class DecisionTreeClassifier():
+class DecisionTreeRegressor():
 
-    def __init__(self, min_samples_split = 2, min_samples_leaf = 2, max_depth = 2, criterion = 'gini'):
+    def __init__(self, min_samples_split = 2, min_samples_leaf = 2, max_depth = 5):
         self.tree = None
       
         self.min_samples_split = min_samples_split
         self.min_samples_leaf = min_samples_leaf
         self.max_depth = max_depth
-        self.criterion = criterion
-
-    def compute_gini_index(self, labels):
-        sigma = 0
-        for class_value in np.unique(labels):
-            class_probability = len(labels[labels == class_value]) / len(labels)
-            sigma += class_probability**2
-        return 1 - sigma
-
-
-    def compute_entropy(self, labels): 
-        entropy = 0
-        for class_value in np.unique(labels):
-            class_probability = len(labels[labels == class_value]) / len(labels)
-            entropy += - class_probability * np.log2(class_probability)
-        return entropy
+       
 
 
     def find_best_split(self, data):
-        max_information_gain = -np.inf
+        max_variance_reduction = -np.inf
         
         best_split_params = [[] for _ in range(5)]
 
@@ -89,17 +69,17 @@ class DecisionTreeClassifier():
 
                 if len(left_data) != 0 and len(right_data) != 0:
                     left_data_labels, right_data_labels, labels = left_data[:, -1], right_data[:, -1], data[:, -1]
-                    information_gain = self.criterion_func(labels) - (len(left_data_labels) / len(labels) * self.criterion_func(left_data_labels) + 
-                                                                     len(right_data_labels) / len(labels) * self.criterion_func(right_data_labels))
+                    variance_reduction = np.std(labels) - (len(left_data_labels) / len(labels) * np.std(left_data_labels) + 
+                                                                     len(right_data_labels) / len(labels) * np.std(right_data_labels))
 
-                    if information_gain > max_information_gain:
-                        max_information_gain = information_gain
+                    if variance_reduction > max_variance_reduction:
+                        max_variance_reduction = variance_reduction
 
                         best_split_params[0] = left_data
                         best_split_params[1] = right_data
                         best_split_params[2] = feature_index
                         best_split_params[3] = feature_value
-                        best_split_params[4] = information_gain
+                        best_split_params[4] = variance_reduction
               
         return best_split_params
     
@@ -129,13 +109,6 @@ class DecisionTreeClassifier():
 
     def fit(self, samples, labels):
         self.features_num = samples.shape[1]
-       
-        if self.criterion == 'gini':
-            self.criterion_func = self.compute_gini_index
-        elif self.criterion == 'entropy':
-            self.criterion_func = self.compute_entropy
-        else:
-            raise SystemExit(f'Criterion with name "{self.criterion}" not found') 
 
         self.tree = self.insert_tree(data = np.concatenate((samples, np.array(labels, ndmin = 2).T), axis = 1))
 
@@ -168,17 +141,27 @@ class DecisionTreeClassifier():
 
 
 
-def acc(targets, predictions):
 
-    return np.equal(targets, predictions).mean()
+dsr = DecisionTreeRegressor()
 
-
-dsc = DecisionTreeClassifier()
-
-dsc.fit(train_data, train_labels)
-predicted_labels = dsc.predict(test_data)
-
-dsc.print_tree()
+dsr.fit(x_train, y_train)
+y_predicted = dsr.predict(x_test)
+dsr.print_tree()
 
 
-print(f"accuracy: {acc(test_labels, predicted_labels) * 100}%")
+
+fig = plt.figure()
+ax = fig.gca(projection ='3d')
+ 
+ax.scatter(x_train[:, 0], x_train[:, 1], y_train, 
+            label ='train values', s = 5, color ="dodgerblue")
+
+ax.scatter(x_test[:, 0], x_test[:, 1], y_test,
+                label ='test values', s = 5, color ="blue")
+ 
+ax.scatter(x_test[:, 0], x_test[:, 1], y_predicted,
+                label ='predicted values', s = 5, color ="orange")
+ax.legend()
+ax.view_init(45, 0)
+ 
+plt.show()
