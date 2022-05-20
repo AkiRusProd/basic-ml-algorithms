@@ -19,7 +19,7 @@ def generate_data(clusters_num):
 
     return data, labels
 
-generated_data, generated_labels = generate_data(clusters_num = 2) #cluster equal class
+
 
 
 def split_data(data, labels, ratio):
@@ -35,7 +35,7 @@ def split_data(data, labels, ratio):
 
 
 
-train_data, test_data, train_labels, test_labels =  split_data(generated_data, generated_labels, ratio = 0.25)
+
 
 
 """CART Decision Tree"""
@@ -173,12 +173,18 @@ def acc(targets, predictions):
     return np.equal(targets, predictions).mean()
 
 
-dsc = DecisionTreeClassifier()
-
-dsc.fit(train_data, train_labels)
-predicted_labels = dsc.predict(test_data)
-
-dsc.print_tree()
 
 
-print(f"accuracy: {acc(test_labels, predicted_labels) * 100}%")
+if __name__ == "__main__":
+    generated_data, generated_labels = generate_data(clusters_num = 2) #clusters equal classes
+    train_data, test_data, train_labels, test_labels =  split_data(generated_data, generated_labels, ratio = 0.25)
+
+    dsc = DecisionTreeClassifier()
+
+    dsc.fit(train_data, train_labels)
+    predicted_labels = dsc.predict(test_data)
+
+    dsc.print_tree()
+
+
+    print(f"accuracy: {acc(test_labels, predicted_labels) * 100}%")

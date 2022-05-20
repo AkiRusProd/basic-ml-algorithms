@@ -14,7 +14,7 @@ def generate_dataset(n = 30, beta = 10, variance_reduction = 10):
 
     return np.concatenate((x, y, z), axis=1)
  
-data = generate_dataset(200)
+
 
 
 
@@ -29,7 +29,7 @@ def split_data(data, ratio):
     return train_data[:, :2], test_data[:, :2], train_data[:, 2], test_data[:, 2]
 
 
-x_train, x_test, y_train, y_test = split_data(data, ratio = 0.25)
+
 
 
 
@@ -141,27 +141,30 @@ class DecisionTreeRegressor():
 
 
 
+if __name__ == "__main__":
+    data = generate_dataset(200)
+    x_train, x_test, y_train, y_test = split_data(data, ratio = 0.25)
 
-dsr = DecisionTreeRegressor()
+    dsr = DecisionTreeRegressor()
 
-dsr.fit(x_train, y_train)
-y_predicted = dsr.predict(x_test)
-dsr.print_tree()
+    dsr.fit(x_train, y_train)
+    y_predicted = dsr.predict(x_test)
+    dsr.print_tree()
 
 
 
-fig = plt.figure()
-ax = fig.gca(projection ='3d')
- 
-ax.scatter(x_train[:, 0], x_train[:, 1], y_train, 
-            label ='train values', s = 5, color ="dodgerblue")
+    fig = plt.figure()
+    ax = fig.gca(projection ='3d')
+    
+    ax.scatter(x_train[:, 0], x_train[:, 1], y_train, 
+                label ='train values', s = 5, color ="dodgerblue")
 
-ax.scatter(x_test[:, 0], x_test[:, 1], y_test,
-                label ='test values', s = 5, color ="blue")
- 
-ax.scatter(x_test[:, 0], x_test[:, 1], y_predicted,
-                label ='predicted values', s = 5, color ="orange")
-ax.legend()
-ax.view_init(45, 0)
- 
-plt.show()
+    ax.scatter(x_test[:, 0], x_test[:, 1], y_test,
+                    label ='test values', s = 5, color ="blue")
+    
+    ax.scatter(x_test[:, 0], x_test[:, 1], y_predicted,
+                    label ='predicted values', s = 5, color ="orange")
+    ax.legend()
+    ax.view_init(45, 0)
+    
+    plt.show()
