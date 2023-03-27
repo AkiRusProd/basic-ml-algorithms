@@ -108,7 +108,7 @@ if __name__ == "__main__":
 
 
     fig = plt.figure()
-    ax = fig.gca(projection ='3d')
+    ax = fig.add_subplot(projection ='3d')
     
     ax.scatter(x_train[:, 0], x_train[:, 1], y_train, 
                 label ='train values', s = 5, color ="dodgerblue")

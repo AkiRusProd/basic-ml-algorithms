@@ -68,9 +68,9 @@ class DecisionTreeRegressor():
                 left_data, right_data = data[data[:, feature_index] <= feature_value], data[data[:, feature_index] > feature_value]
 
                 if len(left_data) != 0 and len(right_data) != 0:
-                    left_data_labels, right_data_labels, labels = left_data[:, -1], right_data[:, -1], data[:, -1]
-                    variance_reduction = np.std(labels) - (len(left_data_labels) / len(labels) * np.std(left_data_labels) + 
-                                                                     len(right_data_labels) / len(labels) * np.std(right_data_labels))
+                    left_data_preds, right_data_preds, preds = left_data[:, -1], right_data[:, -1], data[:, -1]
+                    variance_reduction = np.std(preds) - (len(left_data_preds) / len(preds) * np.std(left_data_preds) + 
+                                                                     len(right_data_preds) / len(preds) * np.std(right_data_preds))
 
                     if variance_reduction > max_variance_reduction:
                         max_variance_reduction = variance_reduction
@@ -84,7 +84,7 @@ class DecisionTreeRegressor():
         return best_split_params
     
     def insert_tree(self, data, tree_depth = 0): 
-        labels = data[:,-1]
+        preds = data[:,-1]
         samples_num = len(data)
 
         if samples_num >= self.min_samples_split and tree_depth <= self.max_depth:
@@ -103,14 +103,14 @@ class DecisionTreeRegressor():
                                 left_subtree, right_subtree, information_gain)
             
 
-        leaf_value = np.argmax(np.bincount(labels.astype(int)))
+        leaf_value = np.mean(preds)
     
         return Node(class_value = leaf_value)
 
-    def fit(self, samples, labels):
+    def fit(self, samples, preds):
         self.features_num = samples.shape[1]
 
-        self.tree = self.insert_tree(data = np.concatenate((samples, np.array(labels, ndmin = 2).T), axis = 1))
+        self.tree = self.insert_tree(data = np.concatenate((samples, np.array(preds, ndmin = 2).T), axis = 1))
 
 
     def predict(self, data):
@@ -154,7 +154,7 @@ if __name__ == "__main__":
 
 
     fig = plt.figure()
-    ax = fig.gca(projection ='3d')
+    ax = fig.add_subplot(projection ='3d')
     
     ax.scatter(x_train[:, 0], x_train[:, 1], y_train, 
                 label ='train values', s = 5, color ="dodgerblue")

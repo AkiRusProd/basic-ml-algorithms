@@ -64,7 +64,7 @@ y_disp = [y(x) for x in x_disp]
 
 
 
-""" Support Vector Machine as NN""" 
+"""Comparison with Gradient descent""" 
 
 w_nn = np.random.normal(0, 0.05, size = (1, 3))
 
