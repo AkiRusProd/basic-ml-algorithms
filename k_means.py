@@ -38,7 +38,7 @@ class K_Means():
 
 
     def initialize_centroids(self):
-
+        # k-means++ centroids initialization
         self.centroids.append(self.data[np.random.randint(len(self.data))])
 
         for _ in range(self.k - 1):
