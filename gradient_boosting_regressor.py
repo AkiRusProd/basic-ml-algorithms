@@ -1,7 +1,7 @@
 import numpy as np 
 
 from decision_tree_regressor import DecisionTreeRegressor
-from decision_tree_regressor import generate_dataset, split_data
+from decision_tree_regressor import generate_data, split_data
 
 class GradientBoostingRegressor():
     def __init__(self, n_estimators=100, max_depth=3, min_samples_split = 2, min_samples_leaf = 2, learning_rate=0.1):
@@ -37,9 +37,9 @@ class GradientBoostingRegressor():
 
 
 if __name__ == "__main__":
-    data = generate_dataset(200)
+    data = generate_data(200)
     x_train, x_test, y_train, y_test = split_data(data, ratio = 0.25)
 
     gbr = GradientBoostingRegressor(n_estimators = 10, max_depth = 5, learning_rate = 0.1)
     gbr.fit(x_train, y_train)
-    y_predicted = gbr.predict(x_test)
+    y_pred = gbr.predict(x_test)

@@ -2,14 +2,14 @@ import numpy as np
 
 
 
-def generate_data(clusters_num):
+def generate_data(clusters_num, samples_num):
     data = np.array([], ndmin = 2)
     labels = np.array([], ndmin = 2)
 
     for i in range(clusters_num):
         mean = np.random.randint(-10, 10, 2)
         cov =  np.random.randint(-10, 10, [2, 2])
-        samples_num = np.random.randint(40, 100, 1)
+        samples_num = np.random.randint(40, 100, 1) if samples_num is None else samples_num
 
         generated_cluster = np.random.multivariate_normal(mean, cov, samples_num)
         data = np.concatenate([data, generated_cluster]) if data.size else generated_cluster
@@ -176,15 +176,15 @@ def acc(targets, predictions):
 
 
 if __name__ == "__main__":
-    generated_data, generated_labels = generate_data(clusters_num = 2) #clusters equal classes
-    train_data, test_data, train_labels, test_labels =  split_data(generated_data, generated_labels, ratio = 0.25)
+    generated_data, generated_labels = generate_data(clusters_num = 2, samples_num = 300) #clusters equal classes
+    x_train, x_test, y_train, y_test =  split_data(generated_data, generated_labels, ratio = 0.25)
 
     dsc = DecisionTreeClassifier()
 
-    dsc.fit(train_data, train_labels)
-    predicted_labels = dsc.predict(test_data)
+    dsc.fit(x_train, y_train)
+    y_pred = dsc.predict(x_test)
 
     dsc.print_tree()
 
 
-    print(f"accuracy: {acc(test_labels, predicted_labels) * 100}%")
+    print(f"accuracy: {acc(y_test, y_pred) * 100}%")

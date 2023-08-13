@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
  
 
-def generate_dataset(n = 30, beta = 10, variance_reduction = 10):
+def generate_data(n = 30, beta = 10, variance_reduction = 10):
 
     e = (np.random.randn(n) * variance_reduction).round(decimals = 1)
 
@@ -142,7 +142,7 @@ class DecisionTreeRegressor():
 
 
 if __name__ == "__main__":
-    data = generate_dataset(200)
+    data = generate_data(200)
     x_train, x_test, y_train, y_test = split_data(data, ratio = 0.25)
 
     dsr = DecisionTreeRegressor()
