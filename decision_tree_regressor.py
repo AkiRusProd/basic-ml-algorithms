@@ -116,23 +116,22 @@ class DecisionTreeRegressor():
 
 
 if __name__ == "__main__":
-    data = generate_regression_data(100)
-    splited_data = split_data(data, ratio = 0.25)
-    x_train, x_test, y_train, y_test = splited_data[0][:, :1], splited_data[1][:, :1], splited_data[0][:, 1], splited_data[1][:, 1]
+    X_train, y_train = generate_regression_data(100)
+    X_train, X_test, y_train, y_test = split_data(X_train, y_train, ratio = 0.25)
 
     dtr = DecisionTreeRegressor()
-    dtr.fit(x_train, y_train)
-    y_pred = dtr.predict(x_test)
+    dtr.fit(X_train, y_train[:, 0])
+    y_pred = dtr.predict(X_test)
 
-    indices = np.argsort(x_test[:, 0])
+    indices = np.argsort(X_test[:, 0])
 
-    xs = np.array(x_test)[indices]
+    xs = np.array(X_test)[indices]
     ys = np.array(y_pred)[indices]
     
     f = plt.figure(figsize = (16 * 0.5, 9 * 0.5))
     ax = f.add_subplot(1, 1, 1)
 
-    ax.plot(x_test, y_test, 'o')
+    ax.plot(X_test, y_test, 'o')
     ax.plot(xs, ys, 'r')
     ax.set_title('Decision Tree Regressor')
     ax.set_xlabel('X')

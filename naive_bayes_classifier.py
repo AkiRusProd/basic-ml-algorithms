@@ -44,11 +44,11 @@ class NaiveBayesClassifier():
 
 
 if __name__ == "__main__":
-    generated_data, generated_labels = generate_clusterization_data(n_clusters = 2)
-    train_data, test_data, train_labels, test_labels =  split_data(generated_data, generated_labels, ratio = 0.25)
+    X_train, y_train = generate_clusterization_data(n_clusters = 2, n_samples = 300)
+    X_train, X_test, y_train, y_test =  split_data(X_train, y_train, ratio = 0.25)
 
     nb = NaiveBayesClassifier()
-    nb.fit(train_data, train_labels)
-    predicted_labels = nb.predict(test_data)
+    nb.fit(X_train, y_train)
+    y_pred = nb.predict(X_test)
 
-    print(f"accuracy: {accuracy(test_labels, predicted_labels) * 100}%")
+    print(f"accuracy: {accuracy(y_test, y_pred) * 100}%")

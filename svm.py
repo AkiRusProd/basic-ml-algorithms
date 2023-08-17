@@ -39,14 +39,14 @@ class SVM:
 
 
 if __name__ == "__main__":
-    generated_data, generated_labels = generate_clusterization_data(n_clusters = 2, n_samples = 300)
+    X_train, y_train = generate_clusterization_data(n_clusters = 2, n_samples = 300)
 
-    generated_labels = generated_labels * 2 - 1 #normalize labels to [-1; 1]
-    x_train, x_test, y_train, y_test =  split_data(generated_data, generated_labels, ratio = 0.25)
+    y_train = y_train * 2 - 1 #normalize labels to [-1; 1]
+    X_train, X_test, y_train, y_test =  split_data(X_train, y_train, ratio = 0.25)
 
 
     svm = SVM()
-    svm.fit(x_train, y_train)
+    svm.fit(X_train, y_train)
 
     w = svm.w
     b = svm.b
@@ -54,15 +54,15 @@ if __name__ == "__main__":
     # x * w0 + y * w1 - b = 0 => y = -(x * w0 - b) / w1
     y = lambda x: -(x * w[0] - b) / w[1]
 
-    x_disp = np.linspace(np.min(x_train[:,0]), np.max(x_train[:,0]), num=10)
+    x_disp = np.linspace(np.min(X_test[:,0]), np.max(X_test[:,0]), num=10)
     y_disp = [y(x) for x in x_disp]
 
     plt.title("Support Vector Machine")
     plt.xlabel("X")
     plt.ylabel("Y")
 
-    plt.scatter(x_train[y_train == 1][:,0], x_train[y_train == 1][:,1], marker='_',color='blue', label='cluster 1')
-    plt.scatter(x_train[y_train == -1][:,0], x_train[y_train == -1][:,1], marker='+',color='green',  label='cluster 2')
+    plt.scatter(X_test[y_test == 1][:,0], X_test[y_test == 1][:,1], marker='_',color='blue', label='cluster 1')
+    plt.scatter(X_test[y_test == -1][:,0], X_test[y_test == -1][:,1], marker='+',color='green',  label='cluster 2')
     
     plt.plot(x_disp, y_disp, 'red', label='SVM')
 

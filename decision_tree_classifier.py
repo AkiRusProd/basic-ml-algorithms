@@ -138,13 +138,13 @@ class DecisionTreeClassifier():
 
 
 if __name__ == "__main__":
-    generated_data, generated_labels = generate_clusterization_data(n_clusters = 2, n_samples = 300)
-    x_train, x_test, y_train, y_test =  split_data(generated_data, generated_labels, ratio = 0.25)
+    X_train, y_train = generate_clusterization_data(n_clusters = 2, n_samples = 300)
+    X_train, X_test, y_train, y_test =  split_data(X_train, y_train, ratio = 0.25)
 
     dtc = DecisionTreeClassifier()
 
-    dtc.fit(x_train, y_train)
-    y_pred = dtc.predict(x_test)
+    dtc.fit(X_train, y_train)
+    y_pred = dtc.predict(X_test)
 
     dtc.print_tree()
 

@@ -87,12 +87,12 @@ class GradientBoostingClassifier():
 
 
 if __name__ == "__main__":
-    generated_data, generated_labels = generate_clusterization_data(n_clusters = 2, n_samples=300)
-    x_train, x_test, y_train, y_test =  split_data(generated_data, generated_labels, ratio = 0.25)
+    X_train, y_train = generate_clusterization_data(n_clusters = 2, n_samples = 300)
+    X_train, X_test, y_train, y_test =  split_data(X_train, y_train, ratio = 0.25)
    
     gbc = GradientBoostingClassifier(n_estimators=30, learning_rate=0.1, max_depth=2)
 
-    gbc.fit(x_train, y_train)
-    y_pred = gbc.predict(x_train)
+    gbc.fit(X_train, y_train)
+    y_pred = gbc.predict(X_test)
 
-    print(f"accuracy: {accuracy(y_train, y_pred) * 100}%")
+    print(f"accuracy: {accuracy(y_test, y_pred) * 100}%")

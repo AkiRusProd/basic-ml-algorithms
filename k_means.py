@@ -6,7 +6,7 @@ from utils import generate_clusterization_data
 
 """K-means"""
 
-class K_Means():
+class KMeans():
 
     def __init__(self, k):
         self.k = k
@@ -62,13 +62,13 @@ class K_Means():
         
 
 if __name__ == '__main__':
-    data, labels = generate_clusterization_data(n_clusters = 3)
+    X_train, y_train = generate_clusterization_data(n_clusters = 3)
 
-    k_means = K_Means(k = 3)
+    k_means = KMeans(k = 3)
 
-    centroids = k_means.fit(data)
+    centroids = k_means.fit(X_train)
 
-    plt.scatter(data[:,0], data[:,1], s = 40, c = labels,  cmap = plt.cm.spring, edgecolors = 'k')
+    plt.scatter(X_train[:,0], X_train[:,1], s = 40, c = y_train,  cmap = plt.cm.spring, edgecolors = 'k')
     plt.scatter(centroids[:,0], centroids[:,1], s = 200, color = 'red' , marker = '*', edgecolors = 'k', label = 'centroids')
 
     plt.legend(loc=2)
