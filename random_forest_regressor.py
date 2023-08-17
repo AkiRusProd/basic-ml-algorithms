@@ -89,9 +89,9 @@ if __name__ == "__main__":
 
     ax.plot(x_test, y_test, 'o')
     ax.plot(xs, ys, 'r')
-    ax.set_title('Prediction')
-    ax.set_xlabel('x')
-    ax.set_ylabel('y')
+    ax.set_title('Random Forrest Regressor')
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
    
     plt.grid()
     plt.show()

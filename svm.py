@@ -1,102 +1,74 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import random
+from utils import generate_clusterization_data, split_data, accuracy
 
 
 
+#https://en.wikipedia.org/wiki/Support_vector_machine
 
-def generate_cluster(mean, cov, objects_num):
-    return np.random.multivariate_normal(mean, cov, objects_num)
 
-def get_data_with_labels(cluster_1_data, cluster_2_data):
-    train_data = []
+class SVM:
+    def __init__(self, lr =0.001, lambda_ = 0.01, n_iterations=1000):
+        self.lr = lr
+        self.lambda_ = lambda_
+        self.n_iterations = n_iterations
 
-    for i in range(len(cluster_1_data)):
-        train_data.append([cluster_1_data[i][0], cluster_1_data[i][1], 1])
+        self.w = None
+        self.b = None
+
+    def fit(self, X, y):
+        assert np.max(y) == 1 and np.min(y) == -1, "Only binary classification is supported"
+        n_samples, n_features = X.shape
+
+        self.w = np.zeros(n_features) if self.w is None else self.w
+        self.b = 0 if self.b is None else self.b
+
+        for _ in range(self.n_iterations):
+            for i in range(n_samples):
+                #Soft margin using Hinge Loss with L2 Regularization
+                #L(w) = Σ max(0, 1 - y * (np.dot(X[i], self.w) - self.b)) + λ||w||^2
+                margin = y[i] * (np.dot(X[i], self.w) - self.b)
+                if margin >= 1:
+                    self.w -= self.lr * (2 * self.lambda_ * self.w)
+                else:
+                    self.w -= self.lr * (2 * self.lambda_ * self.w - X[i] * y[i])
+                    self.b -= self.lr * y[i]
+
+    def predict(self, X):
+        return np.sign(np.dot(X, self.w) - self.b)
+
+
+if __name__ == "__main__":
+    generated_data, generated_labels = generate_clusterization_data(n_clusters = 2, n_samples = 300)
+
+    generated_labels = generated_labels * 2 - 1 #normalize labels to [-1; 1]
+    x_train, x_test, y_train, y_test =  split_data(generated_data, generated_labels, ratio = 0.25)
+
+
+    svm = SVM()
+    svm.fit(x_train, y_train)
+
+    w = svm.w
+    b = svm.b
+
+    # x * w0 + y * w1 - b = 0 => y = -(x * w0 - b) / w1
+    y = lambda x: -(x * w[0] - b) / w[1]
+
+    x_disp = np.linspace(np.min(x_train[:,0]), np.max(x_train[:,0]), num=10)
+    y_disp = [y(x) for x in x_disp]
+
+    plt.title("Support Vector Machine")
+    plt.xlabel("X")
+    plt.ylabel("Y")
+
+    plt.scatter(x_train[y_train == 1][:,0], x_train[y_train == 1][:,1], marker='_',color='blue', label='cluster 1')
+    plt.scatter(x_train[y_train == -1][:,0], x_train[y_train == -1][:,1], marker='+',color='green',  label='cluster 2')
     
-    for i in range(len(cluster_2_data)):
-        train_data.append([cluster_2_data[i][0], cluster_2_data[i][1], -1])
+    plt.plot(x_disp, y_disp, 'red', label='SVM')
 
-    return train_data
-
-
-cluster_1_data = generate_cluster(mean = [2, 2], cov = [[0, 1], [2, 5]], objects_num = 100)
-cluster_2_data = generate_cluster(mean = [5, 0], cov = [[4, 2], [2, 2]], objects_num = 100)
-
-
-train_data = get_data_with_labels(cluster_1_data, cluster_2_data)
-
-train_data = random.sample(train_data, len(train_data))
-
-
-""" Support Vector Machine """ 
-
-epochs = 500
-learning_rate = 0.01
-alpha = 0.1
-
-bias = 1
-
-w = np.random.normal(0, 0.05, size = (1, 3))
-
-for epoch in range(epochs):
-
-    for i in range(len(train_data)):
-        inputs = np.asfarray(np.concatenate((train_data[i][:2], [bias])))
-      
-        label = train_data[i][2]
-
-        margin = label * np.dot(w, inputs)
-     
-        if margin >= 1:
-            w -= learning_rate * (alpha * w/epochs)
-        else:
-            w -= learning_rate * (alpha * w/epochs - inputs * label) 
-
-
-# x * w0 + y * w1 + w2 = 0 => y = -(x * w0 + w2) / w1
-
-y = lambda x: -(x * w[0][0] + w[0][2]) / w[0][1]
-
-
-x_disp = np.linspace(np.min(cluster_1_data[:,0]), np.max(cluster_2_data[:,0]), num=10)
-y_disp = [y(x) for x in x_disp]
-
-
-
-"""Comparison with Gradient descent""" 
-
-w_nn = np.random.normal(0, 0.05, size = (1, 3))
-
-
-# x * w0\
-# y * w1 > = tanh(z) # simple perceptron (z = x * w0 + y * w1 + b * w2)
-# b * w2/
-for i in range (epochs):
-    for j in range(len(train_data)):
-        inputs =  np.array(np.concatenate((train_data[j][:2], [bias])), ndmin = 2)
-        output = np.tanh(np.dot(inputs, w_nn.T))
+    plt.legend(loc=2)
+    plt.grid(True, linestyle='-', color='0.75')
+    plt.show()
         
-        target = train_data[j][2]
-        err = - (target - output) * (1. - np.power(output, 2)) #MSE derivative
-
-        w_nn -= learning_rate * np.dot(inputs.T, err).T
 
 
-y_nn = lambda x: -(x * w_nn[0][0] + w_nn[0][2]) / w_nn[0][1]
-y_disp_nn = [y_nn(x) for x in x_disp]
-
-plt.title("Support Vector Machine")
-plt.xlabel("X")
-plt.ylabel("Y")
-
-
-plt.scatter(cluster_1_data[:,0], cluster_1_data[:,1], marker='_',color='blue', label='cluster 1')
-plt.scatter(cluster_2_data[:,0], cluster_2_data[:,1], marker='+',color='green',  label='cluster 2')
- 
-plt.plot(x_disp, y_disp, 'red', label='SVM') 
-plt.plot(x_disp, y_disp_nn, 'orange', label='Gradient descent') 
-
-plt.legend(loc=2)
-plt.grid(True, linestyle='-', color='0.75')
-plt.show()
