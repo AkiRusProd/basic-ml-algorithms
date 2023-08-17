@@ -1,32 +1,6 @@
 import numpy as np 
 import matplotlib.pyplot as plt
- 
-
-def generate_data(n = 30, beta = 10, variance_reduction = 10):
-
-    e = (np.random.randn(n) * variance_reduction).round(decimals = 1)
-
-    x = (np.random.rand(n) * n)
-    y = (np.random.rand(n) * n)
-
-    z = x * beta + y * beta + e
-    x, y, z = np.expand_dims(x, axis = 1), np.expand_dims(y, axis = 1), np.expand_dims(z, axis = 1)
-
-    return np.concatenate((x, y, z), axis=1)
- 
-
-
-
-
-def split_data(data, ratio):
-    indices = np.arange(len(data))
-    np.random.shuffle(indices)
-
-    data = data[indices].reshape(data.shape)
-
-    train_data, test_data = data[:int(len(data) * (1 - ratio))], data[-int(len(data) * ratio):]
-   
-    return train_data[:, :2], test_data[:, :2], train_data[:, 2], test_data[:, 2]
+from utils import generate_regression_data, split_data
 
 
 
@@ -142,29 +116,27 @@ class DecisionTreeRegressor():
 
 
 if __name__ == "__main__":
-    data = generate_data(200)
-    x_train, x_test, y_train, y_test = split_data(data, ratio = 0.25)
+    data = generate_regression_data(100)
+    splited_data = split_data(data, ratio = 0.25)
+    x_train, x_test, y_train, y_test = splited_data[0][:, :1], splited_data[1][:, :1], splited_data[0][:, 1], splited_data[1][:, 1]
 
-    dsr = DecisionTreeRegressor()
+    dtr = DecisionTreeRegressor()
+    dtr.fit(x_train, y_train)
+    y_pred = dtr.predict(x_test)
 
-    dsr.fit(x_train, y_train)
-    y_predicted = dsr.predict(x_test)
-    dsr.print_tree()
+    indices = np.argsort(x_test[:, 0])
 
-
-
-    fig = plt.figure()
-    ax = fig.add_subplot(projection ='3d')
+    xs = np.array(x_test)[indices]
+    ys = np.array(y_pred)[indices]
     
-    ax.scatter(x_train[:, 0], x_train[:, 1], y_train, 
-                label ='train values', s = 5, color ="dodgerblue")
+    f = plt.figure(figsize = (16 * 0.5, 9 * 0.5))
+    ax = f.add_subplot(1, 1, 1)
 
-    ax.scatter(x_test[:, 0], x_test[:, 1], y_test,
-                    label ='test values', s = 5, color ="blue")
-    
-    ax.scatter(x_test[:, 0], x_test[:, 1], y_predicted,
-                    label ='predicted values', s = 5, color ="orange")
-    ax.legend()
-    ax.view_init(45, 0)
-    
+    ax.plot(x_test, y_test, 'o')
+    ax.plot(xs, ys, 'r')
+    ax.set_title('Prediction')
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+   
+    plt.grid()
     plt.show()

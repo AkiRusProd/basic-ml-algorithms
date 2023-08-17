@@ -1,37 +1,6 @@
 import numpy as np
 from decision_tree_classifier import DecisionTreeClassifier
-
-
-def generate_data(clusters_num):
-    data = np.array([], ndmin = 2)
-    labels = np.array([], ndmin = 2)
-
-    for i in range(clusters_num):
-        mean = np.random.randint(-10, 10, 2)
-        cov =  np.random.randint(-10, 10, [2, 2])
-        samples_num = np.random.randint(40, 100, 1)
-
-        generated_cluster = np.random.multivariate_normal(mean, cov, samples_num)
-        data = np.concatenate([data, generated_cluster]) if data.size else generated_cluster
-
-        generated_claster_labels =np.full(samples_num, i, dtype=int)
-        labels = np.concatenate([labels, generated_claster_labels]) if labels.size else generated_claster_labels
-
-    return data, labels
-
-
-
-
-def split_data(data, labels, ratio):
-    indices = np.arange(len(data))
-    np.random.shuffle(indices)
-
-    data, labels = data[indices].reshape(data.shape), labels[indices].reshape(labels.shape)
-
-    train_data, test_data = data[:int(len(data) * (1 - ratio))], data[-int(len(data) * ratio):]
-    train_labels, test_labels = labels[:int(len(data) * (1 - ratio))], labels[-int(len(data) * ratio):]
-
-    return train_data, test_data, train_labels, test_labels
+from utils import generate_clusterization_data, split_data, accuracy
 
 
 #https://en.wikipedia.org/wiki/Random_forest
@@ -101,14 +70,10 @@ class RandomForestClassifier():
 
 
 
-def acc(targets, predictions):
-
-    return np.equal(targets, predictions).mean()
-
 
 
 if __name__ == "__main__":
-    generated_data, generated_labels = generate_data(clusters_num = 2) #clusters equal classes
+    generated_data, generated_labels = generate_clusterization_data(n_clusters = 2)
     train_data, test_data, train_labels, test_labels =  split_data(generated_data, generated_labels, ratio = 0.25)
 
     rfc = RandomForestClassifier()
@@ -116,5 +81,4 @@ if __name__ == "__main__":
     rfc.fit(train_data, train_labels)
     predicted_labels = rfc.predict(test_data)
 
-
-    print(f"accuracy: {acc(test_labels, predicted_labels) * 100}%")
+    print(f"accuracy: {accuracy(test_labels, predicted_labels) * 100}%")

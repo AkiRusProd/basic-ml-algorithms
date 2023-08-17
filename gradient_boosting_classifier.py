@@ -1,7 +1,7 @@
 import numpy as np 
 
 from decision_tree_regressor import DecisionTreeRegressor, Node
-from decision_tree_classifier import generate_data, split_data, acc
+from utils import generate_clusterization_data, split_data, accuracy
 
 #https://maelfabien.github.io/machinelearning/GradientBoostC/#gradient-boosting-classification-steps
 #https://www.youtube.com/watch?v=jxuNLH5dXCs&ab_channel=StatQuestwithJoshStarmer
@@ -87,7 +87,7 @@ class GradientBoostingClassifier():
 
 
 if __name__ == "__main__":
-    generated_data, generated_labels = generate_data(clusters_num = 2, samples_num=300) #clusters equal classes
+    generated_data, generated_labels = generate_clusterization_data(n_clusters = 2, n_samples=300)
     x_train, x_test, y_train, y_test =  split_data(generated_data, generated_labels, ratio = 0.25)
    
     gbc = GradientBoostingClassifier(n_estimators=30, learning_rate=0.1, max_depth=2)
@@ -95,4 +95,4 @@ if __name__ == "__main__":
     gbc.fit(x_train, y_train)
     y_pred = gbc.predict(x_train)
 
-    print(f"accuracy: {acc(y_train, y_pred) * 100}%")
+    print(f"accuracy: {accuracy(y_train, y_pred) * 100}%")

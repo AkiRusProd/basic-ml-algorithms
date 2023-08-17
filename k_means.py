@@ -1,25 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from utils import generate_clusterization_data
 
-
-def generate_data(clusters_num):
-    data = np.array([])
-    labels = np.array([])
-
-    for i in range(clusters_num):
-        mean = np.random.randint(-10, 10, 2)
-        cov =  np.random.randint(-10, 10, [2, 2])
-        samples_num = np.random.randint(30, 100, 1)
-
-        generated_cluster = np.random.multivariate_normal(mean, cov, samples_num)
-        data = np.concatenate([data, generated_cluster]) if data.size else generated_cluster
-
-        generated_claster_labels =np.full(samples_num, i, dtype=int)
-        labels = np.concatenate([labels, generated_claster_labels]) if labels.size else generated_claster_labels
-
-    return data, labels
-
-data, labels = generate_data(clusters_num = 3)
 
 
 """K-means"""
@@ -79,16 +61,17 @@ class K_Means():
 
         
 
+if __name__ == '__main__':
+    data, labels = generate_clusterization_data(n_clusters = 3)
 
-k_means = K_Means(k = 3)
+    k_means = K_Means(k = 3)
 
-centroids = k_means.fit(data)
+    centroids = k_means.fit(data)
 
-plt.scatter(data[:,0], data[:,1], s = 40, c = labels,  cmap = plt.cm.spring, edgecolors = 'k')
-plt.scatter(centroids[:,0], centroids[:,1], s = 200, color = 'red' , marker = '*', edgecolors = 'k', label = 'centroids')
+    plt.scatter(data[:,0], data[:,1], s = 40, c = labels,  cmap = plt.cm.spring, edgecolors = 'k')
+    plt.scatter(centroids[:,0], centroids[:,1], s = 200, color = 'red' , marker = '*', edgecolors = 'k', label = 'centroids')
 
-
-plt.legend(loc=2)
-plt.grid(True, linestyle='-', color='0.75')
-plt.show()
+    plt.legend(loc=2)
+    plt.grid(True, linestyle='-', color='0.75')
+    plt.show()
 

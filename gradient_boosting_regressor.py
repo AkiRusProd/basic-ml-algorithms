@@ -1,7 +1,7 @@
 import numpy as np 
-
+import matplotlib.pyplot as plt
 from decision_tree_regressor import DecisionTreeRegressor
-from decision_tree_regressor import generate_data, split_data
+from utils import generate_regression_data, split_data
 
 class GradientBoostingRegressor():
     def __init__(self, n_estimators=100, max_depth=3, min_samples_split = 2, min_samples_leaf = 2, learning_rate=0.1):
@@ -37,9 +37,27 @@ class GradientBoostingRegressor():
 
 
 if __name__ == "__main__":
-    data = generate_data(200)
-    x_train, x_test, y_train, y_test = split_data(data, ratio = 0.25)
+    data = generate_regression_data(100)
+    splited_data = split_data(data, ratio = 0.25)
+    x_train, x_test, y_train, y_test = splited_data[0][:, :1], splited_data[1][:, :1], splited_data[0][:, 1], splited_data[1][:, 1]
 
-    gbr = GradientBoostingRegressor(n_estimators = 10, max_depth = 5, learning_rate = 0.1)
+    gbr = GradientBoostingRegressor(n_estimators=30)
     gbr.fit(x_train, y_train)
     y_pred = gbr.predict(x_test)
+
+    indices = np.argsort(x_test[:, 0])
+
+    xs = np.array(x_test)[indices]
+    ys = np.array(y_pred)[indices]
+    
+    f = plt.figure(figsize = (16 * 0.5, 9 * 0.5))
+    ax = f.add_subplot(1, 1, 1)
+
+    ax.plot(x_test, y_test, 'o')
+    ax.plot(xs, ys, 'r')
+    ax.set_title('Prediction')
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+   
+    plt.grid()
+    plt.show()

@@ -1,38 +1,5 @@
 import numpy as np 
-
-
-
-def generate_data(clusters_num, samples_num):
-    data = np.array([], ndmin = 2)
-    labels = np.array([], ndmin = 2)
-
-    for i in range(clusters_num):
-        mean = np.random.randint(-10, 10, 2)
-        cov =  np.random.randint(-10, 10, [2, 2])
-        samples_num = np.random.randint(40, 100, 1) if samples_num is None else samples_num
-
-        generated_cluster = np.random.multivariate_normal(mean, cov, samples_num)
-        data = np.concatenate([data, generated_cluster]) if data.size else generated_cluster
-
-        generated_claster_labels =np.full(samples_num, i, dtype=int)
-        labels = np.concatenate([labels, generated_claster_labels]) if labels.size else generated_claster_labels
-
-    return data, labels
-
-
-
-
-def split_data(data, labels, ratio):
-    indices = np.arange(len(data))
-    np.random.shuffle(indices)
-
-    data, labels = data[indices].reshape(data.shape), labels[indices].reshape(labels.shape)
-
-    train_data, test_data = data[:int(len(data) * (1 - ratio))], data[-int(len(data) * ratio):]
-    train_labels, test_labels = labels[:int(len(data) * (1 - ratio))], labels[-int(len(data) * ratio):]
-
-    return train_data, test_data, train_labels, test_labels
-
+from utils import generate_clusterization_data, split_data, accuracy
 
 
 
@@ -168,23 +135,17 @@ class DecisionTreeClassifier():
 
 
 
-def acc(targets, predictions):
-
-    return np.equal(targets, predictions).mean()
-
-
 
 
 if __name__ == "__main__":
-    generated_data, generated_labels = generate_data(clusters_num = 2, samples_num = 300) #clusters equal classes
+    generated_data, generated_labels = generate_clusterization_data(n_clusters = 2, n_samples = 300)
     x_train, x_test, y_train, y_test =  split_data(generated_data, generated_labels, ratio = 0.25)
 
-    dsc = DecisionTreeClassifier()
+    dtc = DecisionTreeClassifier()
 
-    dsc.fit(x_train, y_train)
-    y_pred = dsc.predict(x_test)
+    dtc.fit(x_train, y_train)
+    y_pred = dtc.predict(x_test)
 
-    dsc.print_tree()
+    dtc.print_tree()
 
-
-    print(f"accuracy: {acc(y_test, y_pred) * 100}%")
+    print(f"accuracy: {accuracy(y_test, y_pred) * 100}%")
