@@ -6,6 +6,7 @@ from utils import generate_clusterization_data, split_data, accuracy
 #https://maelfabien.github.io/machinelearning/GradientBoostC/#gradient-boosting-classification-steps
 #https://www.youtube.com/watch?v=jxuNLH5dXCs&ab_channel=StatQuestwithJoshStarmer
 #https://www.youtube.com/watch?v=StWY5QWMXCw&ab_channel=StatQuestwithJoshStarmer
+#https://www.python-unleashed.com/post/derivation-of-the-binary-cross-entropy-loss-gradient
 
 
 class DecisionTreeRegressorClassifier(DecisionTreeRegressor):
@@ -65,7 +66,7 @@ class GradientBoostingClassifier():
         self.init_y_pred = log_odds
 
         for _ in range(self.n_estimators):
-            #antigrad = -grad =  -dBinaryLogLoss(y_i, F(x_i))/dF(x_i) = - -(y_i - F(x_i)) = y_i - F(x_i)
+            #antigrad = -grad =  -dBinaryLogLoss(y_i, F(x_i))/dF(x_i) = - -(y_i - F(x_i)) = y_i - F(x_i) where F(X) is Sigmoid
             residuals = y - self.sigmoid(y_pred) #residual = observed - predicted
             #fit a new base model on the residuals
             estimator = DecisionTreeRegressorClassifier(max_depth=self.max_depth, min_samples_split=self.min_samples_split, min_samples_leaf=self.min_samples_leaf)

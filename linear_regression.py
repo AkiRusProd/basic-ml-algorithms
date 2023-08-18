@@ -5,10 +5,10 @@ from  utils import generate_linear_regression_data, split_data
 
 
 class MSE:
-    def __call__(self, y_true, y_pred):
+    def __call__(self, y_pred, y_true):
         return np.sum((y_true - y_pred) ** 2) / y_true.size
     
-    def grad(self, y_true, y_pred):
+    def grad(self, y_pred, y_true):
         return -2 * (y_true - y_pred) / y_true.size
 
 
@@ -23,7 +23,7 @@ class SGDRegressor:
         self.weight = None
         self.bias = None
 
-        self.loss = MSE()
+        self.loss_fn = MSE()
 
     def init_weights(self, n_features):
         if self.weight is None or self.bias is None:
@@ -47,12 +47,13 @@ class SGDRegressor:
             tqdm_range.update(1)
             for x_true, y_true in zip(X, y):
                 y_true = y_true[:, np.newaxis]
+                x_true = x_true[None, ...] if x_true.ndim == 1 else x_true
 
                 y_pred = np.matmul(x_true, self.weight) + self.bias
 
-                loss = self.loss(y_true, y_pred)
+                loss = self.loss_fn(y_pred, y_true)
 
-                grad = self.loss.grad(y_true, y_pred)
+                grad = self.loss_fn.grad(y_pred, y_true)
 
                 self.weight -= self.lr * np.matmul(grad.T, x_true)
                 self.bias -= self.lr * np.sum(grad)

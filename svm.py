@@ -47,16 +47,20 @@ if __name__ == "__main__":
 
     svm = SVM()
     svm.fit(X_train, y_train)
+    y_pred = svm.predict(X_test)
+
+    print(f"accuracy: {accuracy(y_test, y_pred) * 100}%")
 
     w = svm.w
     b = svm.b
 
-    # x * w0 + y * w1 - b = 0 => y = -(x * w0 - b) / w1
+    #x * w0 + y * w1 - b = 0 => y = -(x * w0 - b) / w1
     y = lambda x: -(x * w[0] - b) / w[1]
 
     x_disp = np.linspace(np.min(X_test[:,0]), np.max(X_test[:,0]), num=10)
     y_disp = [y(x) for x in x_disp]
 
+    #plot Classification decision boundary
     plt.title("Support Vector Machine")
     plt.xlabel("X")
     plt.ylabel("Y")
