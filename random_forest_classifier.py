@@ -1,6 +1,7 @@
 import numpy as np
 from decision_tree_classifier import DecisionTreeClassifier
-from utils import generate_clusterization_data, split_data, accuracy
+from utils import generate_clusterization_data, split_data
+from metrics import accuracy
 
 
 #https://en.wikipedia.org/wiki/Random_forest

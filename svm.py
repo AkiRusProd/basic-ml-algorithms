@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from utils import generate_clusterization_data, split_data, accuracy
+from utils import generate_clusterization_data, split_data
+from metrics import accuracy
 
 
 

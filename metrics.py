@@ -1,10 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from logistic_regression import LogisticRegression
-from utils import generate_clusterization_data, split_data, accuracy
+from utils import generate_clusterization_data, split_data
 
 
-#In fact roc_curve cannot be considered a separate algorithm; it is an evaluation metric in binary classification problems
+def accuracy(targets, predictions):
+    return np.equal(targets, predictions).mean()
 
 def roc_сurve(y_true: np.ndarray[int], y_score: np.ndarray[float]):
     sorted_indices = np.argsort(y_score)[::-1]

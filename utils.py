@@ -77,5 +77,3 @@ def split_data(X, y = None, ratio = 0.25):
     return X_train, X_test, y_train, y_test
 
 
-def accuracy(targets, predictions):
-    return np.equal(targets, predictions).mean()

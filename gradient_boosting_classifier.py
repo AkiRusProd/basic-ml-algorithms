@@ -1,7 +1,8 @@
 import numpy as np 
 
 from decision_tree_regressor import DecisionTreeRegressor, Node
-from utils import generate_clusterization_data, split_data, accuracy
+from utils import generate_clusterization_data, split_data
+from metrics import accuracy
 
 #https://maelfabien.github.io/machinelearning/GradientBoostC/#gradient-boosting-classification-steps
 #https://www.youtube.com/watch?v=jxuNLH5dXCs&ab_channel=StatQuestwithJoshStarmer

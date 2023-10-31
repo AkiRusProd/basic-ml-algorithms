@@ -1,7 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
-from  utils import generate_clusterization_data, split_data, accuracy
+from utils import generate_clusterization_data, split_data
+from metrics import accuracy
 
 
 #https://www.python-unleashed.com/post/derivation-of-the-binary-cross-entropy-loss-gradient
