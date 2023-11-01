@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 from utils import generate_clusterization_data, split_data
-from metrics import accuracy
+from metrics import accuracy, roc_сurve, auc
 
 
 #https://www.python-unleashed.com/post/derivation-of-the-binary-cross-entropy-loss-gradient
@@ -93,9 +93,9 @@ if __name__ == '__main__':
 
     model = LogisticRegression(n_iterations=1000)
     losses = model.fit(X_train, y_train[:, None])
-    y_pred = model.predict(X_test)
+    y_score = model.predict(X_test)
     
-    y_pred = np.where(y_pred >= 0.5, 1, 0)
+    y_pred = np.where(y_score >= 0.5, 1, 0)
 
     print(f"accuracy: {accuracy(y_test, y_pred[...,0]) * 100}%")
 
@@ -120,4 +120,13 @@ if __name__ == '__main__':
 
     plt.legend(loc=2)
     plt.grid(True, linestyle='-', color='0.75')
+    plt.show()
+
+    fpr, tpr, thresholds = roc_сurve(y_test, y_score.squeeze(1))
+    print(f"AUC: {auc(fpr, tpr)}")
+ 
+    plt.plot(fpr, tpr)
+    plt.xlabel("FPR")
+    plt.ylabel("TPR")
+    plt.title("ROC Curve")
     plt.show()
