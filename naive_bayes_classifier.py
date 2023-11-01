@@ -3,7 +3,7 @@ from utils import generate_clusterization_data, split_data
 from metrics import accuracy
 
 
-
+# https://en.wikipedia.org/wiki/Naive_Bayes_classifier
 class NaiveBayesClassifier():
         
     def norm_pdf(self, x, mean, var):
@@ -17,7 +17,10 @@ class NaiveBayesClassifier():
             # Logarithms are used to prevent precision issues when dealing with very small probabilities 
             # and to speed up computations by transforming the multiplication of probabilities into the sum of their logarithms.
 
-            posteriors.append(np.sum(np.log(self.norm_pdf(x, self.mean[i], self.var[i]))) + np.log(self.priors[i])) # class_conditional + prior
+            # P(c|x) = P(c) * ∏(P(x|c)) =>
+            # log(P(c|x)) = log(P(c)) + ∑(log(P(x|c))) =>
+            # posterior = prior + class_conditional
+            posteriors.append(np.log(self.priors[i]) + np.sum(np.log(self.norm_pdf(x, self.mean[i], self.var[i])))) 
 
         return self.classes[np.argmax(posteriors)]
 
