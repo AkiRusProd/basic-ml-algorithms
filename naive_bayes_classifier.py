@@ -5,43 +5,41 @@ from metrics import accuracy
 
 
 class NaiveBayesClassifier():
-
-    def __init__(self):
-        pass
         
-        
-    def normal_distribution(self, x, mean, var):
-        
-        return np.exp(-0.5 * np.power((x - mean) / var, 2)) / var * np.sqrt(2 * np.pi)
+    def norm_pdf(self, x, mean, var):
+        return np.exp(-0.5 * np.power((x - mean) / np.sqrt(var), 2)) / (np.sqrt(2 * np.pi) * np.sqrt(var))
 
 
-    def map_estimation(self, sample):
-        classes_probabilities = [[] for _ in range(self.classes_num)]
+    def map_estimation(self, x):
+        posteriors = [] # classes probabilities
 
-        for i in range(self.classes_num):
-            classes_probabilities[i] = np.sum(np.log(self.normal_distribution(sample, self.mean[i], self.var[i]))) + np.log(self.priors[i])
+        for i, c in enumerate(self.classes):
+            # Logarithms are used to prevent precision issues when dealing with very small probabilities 
+            # and to speed up computations by transforming the multiplication of probabilities into the sum of their logarithms.
 
-        return np.argmax(classes_probabilities)
+            posteriors.append(np.sum(np.log(self.norm_pdf(x, self.mean[i], self.var[i]))) + np.log(self.priors[i])) # class_conditional + prior
 
-
-    def fit(self, data, labels):
-        self.samples_num, self.params_num = data.shape
-        self.classes_num = len(np.unique(labels))
-
-        self.mean = np.zeros((self.classes_num, self.params_num))
-        self.var = np.zeros((self.classes_num, self.params_num))
-        self.priors = np.zeros((self.classes_num))
-
-        for i in range(self.classes_num):
-            self.mean[i] = data[i == labels].mean(axis = 0)
-            self.var[i] = data[i == labels].var(axis = 0)
-            self.priors[i] = len(data[i == labels]) / self.samples_num
+        return self.classes[np.argmax(posteriors)]
 
 
-    def predict(self, data):
-        return [self.map_estimation(sample) for sample in data]
+    def fit(self, X, y):
+        n_samples, n_features = X.shape
+        self.classes = np.unique(y)
+        n_classes = len(self.classes)
 
-   
+        self.mean = np.zeros((n_classes, n_features))
+        self.var = np.zeros((n_classes, n_features))
+        self.priors = np.zeros((n_classes))
+
+        for i, c in enumerate(self.classes):
+            X_c = X[y == c]
+            self.mean[i] = X_c.mean(axis=0)
+            self.var[i] = X_c.var(axis=0)
+            self.priors[i] = len(X_c) / n_samples
+
+
+    def predict(self, X):
+        return [self.map_estimation(x) for x in X]
 
 
 if __name__ == "__main__":
