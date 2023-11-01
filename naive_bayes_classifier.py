@@ -4,6 +4,8 @@ from metrics import accuracy
 
 
 # https://en.wikipedia.org/wiki/Naive_Bayes_classifier
+
+# Bayes theorem: P(c|x) = P(x|c) * P(c) / P(x)
 class NaiveBayesClassifier():
         
     def norm_pdf(self, x, mean, var):
@@ -20,6 +22,9 @@ class NaiveBayesClassifier():
             # P(c|x) = P(c) * ∏(P(x|c)) =>
             # log(P(c|x)) = log(P(c)) + ∑(log(P(x|c))) =>
             # posterior = prior + class_conditional
+            # We ignore P(x) in the Bayes formula, as it doesn't affect which class has the highest probability (since the P(x) does not depend on C and property values X are given). 
+            # So we set P(x) = 1. (constant))
+
             posteriors.append(np.log(self.priors[i]) + np.sum(np.log(self.norm_pdf(x, self.mean[i], self.var[i])))) 
 
         return self.classes[np.argmax(posteriors)]
