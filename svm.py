@@ -55,11 +55,34 @@ if __name__ == "__main__":
     w = svm.w
     b = svm.b
 
-    #x * w0 + y * w1 - b = 0 => y = -(x * w0 - b) / w1
-    y = lambda x: -(x * w[0] - b) / w[1]
-
     x_disp = np.linspace(np.min(X_test[:,0]), np.max(X_test[:,0]), num=10)
+
+    #optimal hyperplane
+    #x * w0 + y * w1 - b = 0 
+    #express y from equation
+    # => y = -(x * w0 - b) / w1
+    y = lambda x: -(x * w[0] - b) / w[1]
     y_disp = [y(x) for x in x_disp]
+
+    plt.plot(x_disp, y_disp, 'red', label='SVM')
+
+    #first edge of the hyperplane
+    #x * w0 + y * w1 - b = 1
+    #express y from equation
+    # => y = -(x * w0 - 1 - b) / w1
+    y = lambda x: -(x * w[0] - 1 - b) / w[1]
+    y_disp = [y(x) for x in x_disp]
+
+    plt.plot(x_disp, y_disp, 'red', label='edge', linestyle=':', linewidth=0.5)
+
+    #second edge of the hyperplane
+    #x * w0 + y * w1 - b = -1
+    #express y from equation
+    # => y = -(x * w0 + 1 - b) / w1
+    y = lambda x: -(x * w[0] + 1 - b) / w[1]
+    y_disp = [y(x) for x in x_disp]
+
+    plt.plot(x_disp, y_disp, 'red', label='edge', linestyle=':', linewidth=0.5)
 
     #plot Classification decision boundary
     plt.title("Support Vector Machine")
@@ -68,8 +91,6 @@ if __name__ == "__main__":
 
     plt.scatter(X_test[y_test == 1][:,0], X_test[y_test == 1][:,1], marker='_',color='blue', label='cluster 1')
     plt.scatter(X_test[y_test == -1][:,0], X_test[y_test == -1][:,1], marker='+',color='green',  label='cluster 2')
-    
-    plt.plot(x_disp, y_disp, 'red', label='SVM')
 
     plt.legend(loc=2)
     plt.grid(True, linestyle='-', color='0.75')

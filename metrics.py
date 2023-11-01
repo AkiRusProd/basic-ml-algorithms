@@ -5,6 +5,7 @@ def accuracy(targets, predictions):
     return np.equal(targets, predictions).mean()
 
 def roc_сurve(y_true: np.ndarray[int], y_score: np.ndarray[float]):
+    # https://www.youtube.com/watch?v=4jRBRDbJemM
     sorted_indices = np.argsort(y_score)[::-1]
 
     y_true = y_true[sorted_indices]
