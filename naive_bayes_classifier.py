@@ -5,7 +5,9 @@ from metrics import accuracy
 
 # https://en.wikipedia.org/wiki/Naive_Bayes_classifier
 
-# Bayes theorem: P(c|x) = P(x|c) * P(c) / P(x)
+# Bayes theorem: P(c|x) = P(c) * P(x|c) / P(x) or posterior = prior * likelihood / evidence
+# We ignore P(x) in the Bayes formula, as it doesn't affect which class has the highest probability (since the P(x) does not depend on C and property values X are given). 
+# So we set P(x) = 1. (constant)): P(c|x) = P(c) * P(x|c) or posterior = prior * likelihood
 class NaiveBayesClassifier():
         
     def norm_pdf(self, x, mean, var):
@@ -19,12 +21,10 @@ class NaiveBayesClassifier():
             # Logarithms are used to prevent precision issues when dealing with very small probabilities 
             # and to speed up computations by transforming the multiplication of probabilities into the sum of their logarithms.
 
-            # P(c|x) = P(c) * ∏(P(x|c)) =>
-            # log(P(c|x)) = log(P(c)) + ∑(log(P(x|c))) =>
+            # P(c|x_1, x_2, ..., x_n) = P(c) * ∏(P(x_i|c)) =>
+            # log(P(c|x1, x2, ..., xn)) = log(P(c)) + ∑(log(P(x_i|c))) =>
             # posterior = prior + class_conditional
-            # We ignore P(x) in the Bayes formula, as it doesn't affect which class has the highest probability (since the P(x) does not depend on C and property values X are given). 
-            # So we set P(x) = 1. (constant))
-
+           
             posteriors.append(np.log(self.priors[i]) + np.sum(np.log(self.norm_pdf(x, self.mean[i], self.var[i])))) 
 
         return self.classes[np.argmax(posteriors)]
