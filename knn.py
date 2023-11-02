@@ -6,45 +6,48 @@ from utils import generate_clusterization_data
 
 
 """K-nearest neighbors"""
-
 class KNNClassifier():
+    def __init__(self, n_neighbors=3, metric='euclidean', weights = 'uniform'):
+        self.k = n_neighbors
+        self.metric = metric
+        self.weights = weights
+        self.distance = {
+            'euclidean': lambda x, y: np.linalg.norm(x - y),
+            'manhattan': lambda x, y: np.sum(np.abs(x - y)),
+            'chebyshev': lambda x, y: np.max(np.abs(x - y)),
+            'cosine': lambda x, y: 1 - np.dot(x, y) / (np.linalg.norm(x) * np.linalg.norm(y)),
+            'canberra': lambda x, y: np.sum(np.abs(x - y) / (np.abs(x) + np.abs(y) + 1e-15)),
+            'braycurtis': lambda x, y: np.sum(np.abs(x - y) / (np.sum(np.abs(x)) + np.sum(np.abs(y)) + 1e-15)),
+            'hamming': lambda x, y: np.average(np.atleast_1d(x) != np.atleast_1d(y))
 
-    def __init__(self, k = 5) -> None:
-        self.k = k
-        self.data = None
-        self.labels = None
-
-
-    def euclidean_distance(self, vector1, vector2):
-
-        return np.linalg.norm(vector1 - vector2)
-
-
-    def find_nearest_neighbour(self, this_sample):
-        distances = np.asfarray([self.euclidean_distance(this_sample, sample) for sample in self.data])
-
-        indexes = distances.argsort()
-
-        neighbours = self.labels[indexes]
-
-        k_neighbours = neighbours[:self.k]
+        }[metric]
+    
+    def fit(self, X, y):
+        self.X = X
+        self.y = y
         
-        return np.argmax(np.bincount(k_neighbours.astype(int)))
+    def predict(self, X):
+        predictions = []
+        for x in X:
+            distances = np.array([self.distance(x, y) for y in self.X])
+            k_nearest_neighbors = self.y[distances.argsort()[:self.k]]
 
-    def fit(self, data, labels) -> None:
-        self.data = data
-        self.labels = labels
+            if self.weights == 'distance':
+                k_weights = np.array([1 / (distance + 1E-15) for distance in np.sort(distances)[:self.k]]) #distances[distances.argsort()[:self.k]]
+                k_weights = k_weights / np.sum(k_weights)
+             
+                predictions.append(np.argmax(np.bincount(k_nearest_neighbors, weights = k_weights)))
+            elif self.weights == 'uniform':
+                predictions.append(np.argmax(np.bincount(k_nearest_neighbors)))
 
-    def predict(self, new_data):
-
-        return np.asfarray([self.find_nearest_neighbour(sample) for sample in new_data])
+        return np.array(predictions)
 
        
 
 if __name__ == "__main__":
     X_train, y_test = generate_clusterization_data(n_clusters = 3, n_samples = 30)
 
-    knn = KNNClassifier(k = 5)
+    knn = KNNClassifier(n_neighbors = 5)
     knn.fit(X_train, y_test)
 
 
