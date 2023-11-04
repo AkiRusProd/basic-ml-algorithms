@@ -23,17 +23,32 @@ class Node():
 
 class DecisionTreeRegressor():
 
-    def __init__(self, min_samples_split = 2, min_samples_leaf = 2, max_depth = 5):
+    def __init__(self, min_samples_split = 2, min_samples_leaf = 2, max_depth = 5, criterion = 'variance reduction'):
         self.tree = None
       
         self.min_samples_split = min_samples_split
         self.min_samples_leaf = min_samples_leaf
         self.max_depth = max_depth
+        self.criterion = criterion
        
+    def compute_variance_reduction(self, left_data_preds, right_data_preds, data_preds):
+        return np.std(data_preds) - (len(left_data_preds) / len(data_preds) * np.std(left_data_preds) +
+                                     len(right_data_preds) / len(data_preds) * np.std(right_data_preds))
 
+    def compute_mse(self, left_data_preds, right_data_preds, data_preds):
+        left_mse = np.mean((left_data_preds - np.mean(left_data_preds)) ** 2) if len(left_data_preds) > 0 else 0
+        right_mse = np.mean((right_data_preds - np.mean(right_data_preds)) ** 2) if len(right_data_preds) > 0 else 0
+        mse = (len(left_data_preds)/len(data_preds) * left_mse + len(right_data_preds)/len(data_preds) * right_mse)
+        return mse
+
+    def compute_mae(self, left_data_preds, right_data_preds, data_preds):
+        left_mae = np.mean(np.abs(left_data_preds - np.mean(left_data_preds))) if len(left_data_preds) > 0 else 0
+        right_mae = np.mean(np.abs(right_data_preds - np.mean(right_data_preds))) if len(right_data_preds) > 0 else 0
+        mae = (len(left_data_preds)/len(data_preds) * left_mae + len(right_data_preds)/len(data_preds) * right_mae)
+        return mae
 
     def find_best_split(self, data):
-        max_variance_reduction = -np.inf
+        best_score = np.inf if self.criterion in ['mse', 'mae']  else -np.inf
         
         best_split_params = [[] for _ in range(5)]
 
@@ -43,17 +58,16 @@ class DecisionTreeRegressor():
 
                 if len(left_data) != 0 and len(right_data) != 0:
                     left_data_preds, right_data_preds, preds = left_data[:, -1], right_data[:, -1], data[:, -1]
-                    variance_reduction = np.std(preds) - (len(left_data_preds) / len(preds) * np.std(left_data_preds) + 
-                                                                     len(right_data_preds) / len(preds) * np.std(right_data_preds))
+                    score = self.criterion_func(left_data_preds, right_data_preds, preds)
 
-                    if variance_reduction > max_variance_reduction:
-                        max_variance_reduction = variance_reduction
-
+                    # NOTE: we are minimizing criterion if it's mse or mae and maximizing if it's variance reduction
+                    if (self.criterion in ['mse', 'mae'] and score < best_score) or (self.criterion == 'variance reduction' and score > best_score):
+                        best_score = score
                         best_split_params[0] = left_data
                         best_split_params[1] = right_data
                         best_split_params[2] = feature_index
                         best_split_params[3] = feature_value
-                        best_split_params[4] = variance_reduction
+                        best_split_params[4] = score
               
         return best_split_params
     
@@ -83,6 +97,15 @@ class DecisionTreeRegressor():
 
     def fit(self, samples, preds):
         self.features_num = samples.shape[1]
+
+        if self.criterion == 'mse':
+            self.criterion_func = self.compute_mse
+        elif self.criterion == 'mae':
+            self.criterion_func = self.compute_mae
+        elif self.criterion == 'variance reduction':
+            self.criterion_func = self.compute_variance_reduction
+        else:
+            raise SystemExit(f'Criterion with name "{self.criterion}" not found') 
 
         self.tree = self.insert_tree(data = np.concatenate((samples, np.array(preds, ndmin = 2).T), axis = 1))
 
