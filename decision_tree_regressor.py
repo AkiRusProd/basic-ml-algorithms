@@ -36,19 +36,27 @@ class DecisionTreeRegressor():
                                      len(right_data_preds) / len(data_preds) * np.std(right_data_preds))
 
     def compute_mse(self, left_data_preds, right_data_preds, data_preds):
-        left_mse = np.mean((left_data_preds - np.mean(left_data_preds)) ** 2) if len(left_data_preds) > 0 else 0
-        right_mse = np.mean((right_data_preds - np.mean(right_data_preds)) ** 2) if len(right_data_preds) > 0 else 0
-        mse = (len(left_data_preds)/len(data_preds) * left_mse + len(right_data_preds)/len(data_preds) * right_mse)
+        left_part = np.sum((left_data_preds - np.mean(left_data_preds)) ** 2) if len(left_data_preds) > 0 else 0
+        right_part = np.sum((right_data_preds - np.mean(right_data_preds)) ** 2) if len(right_data_preds) > 0 else 0
+        mse = 1/len(data_preds) * (left_part + right_part)
         return mse
 
     def compute_mae(self, left_data_preds, right_data_preds, data_preds):
-        left_mae = np.mean(np.abs(left_data_preds - np.mean(left_data_preds))) if len(left_data_preds) > 0 else 0
-        right_mae = np.mean(np.abs(right_data_preds - np.mean(right_data_preds))) if len(right_data_preds) > 0 else 0
-        mae = (len(left_data_preds)/len(data_preds) * left_mae + len(right_data_preds)/len(data_preds) * right_mae)
+        left_part = np.sum(np.abs(left_data_preds - np.mean(left_data_preds))) if len(left_data_preds) > 0 else 0
+        right_part = np.sum(np.abs(right_data_preds - np.mean(right_data_preds))) if len(right_data_preds) > 0 else 0
+        mae = 1/len(data_preds) * (left_part + right_part)
         return mae
 
+    # def compute_sse(self, left_data_preds, right_data_preds, _):
+    #     #NOTE: Almost the same is mse (https://stats.stackexchange.com/questions/220350/regression-trees-how-are-splits-decided)
+    #     #I don't want to add it, because it doesn't make sense.
+    #     left_part = np.sum((left_data_preds - np.mean(left_data_preds)) ** 2) if len(left_data_preds) > 0 else 0
+    #     right_part = np.sum((right_data_preds - np.mean(right_data_preds)) ** 2) if len(right_data_preds) > 0 else 0
+    #     sse = left_part + right_part
+    #     return sse
+
     def find_best_split(self, data):
-        best_score = np.inf if self.criterion in ['mse', 'mae']  else -np.inf
+        best_score = np.inf if self.criterion != 'variance reduction'  else -np.inf
         
         best_split_params = [[] for _ in range(5)]
 
@@ -61,7 +69,7 @@ class DecisionTreeRegressor():
                     score = self.criterion_func(left_data_preds, right_data_preds, preds)
 
                     # NOTE: we are minimizing criterion if it's mse or mae and maximizing if it's variance reduction
-                    if (self.criterion in ['mse', 'mae'] and score < best_score) or (self.criterion == 'variance reduction' and score > best_score):
+                    if (self.criterion != 'variance reduction' and score < best_score) or (self.criterion == 'variance reduction' and score > best_score):
                         best_score = score
                         best_split_params[0] = left_data
                         best_split_params[1] = right_data
@@ -102,6 +110,8 @@ class DecisionTreeRegressor():
             self.criterion_func = self.compute_mse
         elif self.criterion == 'mae':
             self.criterion_func = self.compute_mae
+        # elif self.criterion == 'sse':
+        #     self.criterion_func = self.compute_sse
         elif self.criterion == 'variance reduction':
             self.criterion_func = self.compute_variance_reduction
         else:
