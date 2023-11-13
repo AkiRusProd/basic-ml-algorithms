@@ -5,7 +5,7 @@ from utils import generate_clusterization_data, split_data
 from metrics import accuracy, roc_сurve, auc
 
 
-#https://www.python-unleashed.com/post/derivation-of-the-binary-cross-entropy-loss-gradient
+# https://www.python-unleashed.com/post/derivation-of-the-binary-cross-entropy-loss-gradient
 
 class Sigmoid():
     def __call__(self, x):
@@ -63,10 +63,10 @@ class LogisticRegression():
                 z = np.matmul(x_true, self.weight.T) + self.bias
                 y_pred = self.activation(z)
                 
-                #grad = dBinaryLogLoss/dw = -dL(p, y)/dp * dp/dz * dz/dw = (p - y) * x; where p = F(z) = Sigmoid(z)
-                #So you can do the math something like this:
+                # grad = dBinaryLogLoss/dw = -dL(p, y)/dp * dp/dz * dz/dw = (p - y) * x; where p = F(z) = Sigmoid(z)
+                # So you can do the math something like this:
                 # grad = self.loss_fn.grad(y_pred, y_true) * self.activation.grad(z) #equals -dL(p, y)/dp * dp/dz = p - y
-                #Or simply like this:
+                # Or simply like this:
                 grad = y_pred - y_true
                 
                 self.weight -= self.lr * np.matmul(x_true.T, grad).T #np.matmul(grad.T, x_true) equals dz/dw
@@ -104,11 +104,12 @@ if __name__ == '__main__':
 
     x_disp = np.linspace(np.min(X_test[:,0]), np.max(X_test[:,0]), num=10)
    
-    #x * w0 + y * w1 + b = 0 => y = -(x * w0 + b) / w1
+    # x * w0 + y * w1 + b = 0 => y = -(x * w0 + b) / w1 (separating hyperplane)
+    # you can verify this if you express z from this expression: sigmoid(z) = 0.5, where z = Σ(xi * wi) + b; so z = Σ(xi * wi) + b = 0
     y = lambda x: -(x * w[0][0] + b[0][0]) / w[0][1]
     y_disp= [y(x) for x in x_disp]
 
-    #plot Classification decision boundary
+    # plot Classification decision boundary
     plt.title("Logistic Regression")
     plt.xlabel("X")
     plt.ylabel("Y")
