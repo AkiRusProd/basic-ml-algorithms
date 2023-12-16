@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 from utils import generate_clusterization_data, split_data
-from metrics import accuracy, roc_сurve, auc
+from metrics import accuracy, roc_сurve, pr_curve, auc
 
 
 # https://www.python-unleashed.com/post/derivation-of-the-binary-cross-entropy-loss-gradient
@@ -130,4 +130,13 @@ if __name__ == '__main__':
     plt.xlabel("FPR")
     plt.ylabel("TPR")
     plt.title("ROC Curve")
+    plt.show()
+
+    precision, recall, thresholds = pr_curve(y_test, y_score.squeeze(1))
+    print(f"AUC: {auc(recall, precision)}")
+
+    plt.plot(recall, precision)
+    plt.xlabel("Recall")
+    plt.ylabel("Precision")
+    plt.title("PR Curve")
     plt.show()
