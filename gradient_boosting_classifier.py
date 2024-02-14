@@ -44,6 +44,15 @@ class DecisionTreeRegressorClassifier(DecisionTreeRegressor):
     def fit(self, samples, preds, prev_probs):
         self.features_num = samples.shape[1]
 
+        if self.criterion == 'mse':
+            self.criterion_func = self.compute_mse
+        elif self.criterion == 'mae':
+            self.criterion_func = self.compute_mae
+        elif self.criterion == 'variance reduction':
+            self.criterion_func = self.compute_variance_reduction
+        else:
+            raise SystemExit(f'Criterion with name "{self.criterion}" not found') 
+
         self.tree = self.insert_tree(data = np.concatenate((samples, np.array(prev_probs, ndmin = 2).T, np.array(preds, ndmin = 2).T,), axis = 1))
         
 
