@@ -75,7 +75,7 @@ class BinaryGradientBoostingClassifier():
         self.init_y_pred = log_odds
 
         for _ in range(self.n_estimators):
-            #antigrad = -grad =  -dBinaryLogLoss(y_i, F(x_i))/dF(x_i) = - -(y_i - F(x_i)) = y_i - F(x_i) where F(X) is Sigmoid
+            #antigrad = -grad =  -dBinaryLogLoss(y_i, F(x_i))/dx_i = - -(y_i - F(x_i)) = y_i - F(x_i) where F(X) is Sigmoid
             residuals = y - self.sigmoid(y_pred) #residual = observed - predicted
             #fit a new base model on the residuals
             estimator = DecisionTreeRegressorClassifier(max_depth=self.max_depth, min_samples_split=self.min_samples_split, min_samples_leaf=self.min_samples_leaf)
@@ -127,7 +127,7 @@ class MulticlassGradientBoostingClassifier():
         for _ in range(self.n_estimators):
             class_estimators = []
             for c in range(self.n_classes):
-                #antigrad = -grad  -dBinaryLogLoss(y_i, F(x_i))/dF(x_i) = - -(y_i - F(x_i)) = y_i - F(x_i) where F(X) is Softmax
+                #antigrad = -grad  -dLogLoss(y_i, F(x_i))/dx_i = - -(y_i - F(x_i)) = y_i - F(x_i) where F(X) is Softmax
                 residuals = y[:, c] - self.softmax(y_pred)[:, c] #residual = observed - predicted
                 #fit a new base model on the residuals
                 estimator = DecisionTreeRegressorClassifier(max_depth=self.max_depth, min_samples_split=self.min_samples_split, min_samples_leaf=self.min_samples_leaf)
